@@ -12,6 +12,7 @@
     <RootNamespace>DeepSeekTokenMonitor</RootNamespace>
     <Version>1.0.0</Version>
     <Description>DeepSeek Token 用量监控桌面侧边栏</Description>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
 </Project>
