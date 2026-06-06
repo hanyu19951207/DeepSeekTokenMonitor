@@ -28,6 +28,23 @@ public class UsageTracker
     public UsageTracker()
     {
         Load();
+        PurgeInvalidSnapshots();
+    }
+
+    /// <summary>
+    /// 清理 Balance=0 的无效快照（来自 API 字段修复前的历史脏数据）
+    /// </summary>
+    private void PurgeInvalidSnapshots()
+    {
+        lock (_lock)
+        {
+            var before = _snapshots.Count;
+            _snapshots.RemoveAll(s => s.Balance == 0);
+            if (_snapshots.Count < before)
+            {
+                Save();
+            }
+        }
     }
 
     /// <summary>
@@ -59,7 +76,7 @@ public class UsageTracker
 
             var cutoff = DateTime.Now.AddDays(-days);
             var relevant = _snapshots
-                .Where(s => s.Timestamp >= cutoff)
+                .Where(s => s.Timestamp >= cutoff && s.Balance > 0)
                 .OrderBy(s => s.Timestamp)
                 .ToList();
 
@@ -103,7 +120,7 @@ public class UsageTracker
         {
             var cutoff = DateTime.Now - period;
             var relevant = _snapshots
-                .Where(s => s.Timestamp >= cutoff)
+                .Where(s => s.Timestamp >= cutoff && s.Balance > 0)
                 .OrderBy(s => s.Timestamp)
                 .ToList();
 
